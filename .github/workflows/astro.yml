@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy Astro to GitHub Pages
 
 on:
   workflow_dispatch:
@@ -8,7 +8,8 @@ on:
 
 permissions:
   contents: read
-  deployments: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}
@@ -31,32 +32,29 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Static HTML export
+      - name: Build Astro pages
         run: pnpm build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: deploy
           path: ./dist
 
   deploy:
-    runs-on: ubuntu-latest
     needs: build
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: deploy
-          path: ./dist
+    runs-on: ubuntu-latest
 
-      - name: Publish to Cloudflare Pages
-        id: deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy --project-name ${{ secrets.CLOUDFLARE_PROJECT_NAME }} ./dist
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
