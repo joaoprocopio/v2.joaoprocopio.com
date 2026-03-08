@@ -10,7 +10,8 @@ const GOOGLE_DOCS_RESUME_URL =
   "https://docs.google.com/document/d/1Zyc6JFGPVfEC3cXRTnx44ExETdle8AbWihFW4_de4W0/edit?usp=sharing"
 
 export default defineConfig({
-  site: "https://joaoprocopio.com",
+  site: "https://joaoprocopio.github.io/v2.joaoprocopio.com/",
+  base: "v2.joaoprocopio.com/",
   integrations: [
     sitemap() /* TODO: integrar o sitemap com o blog  */,
     mdx(),
